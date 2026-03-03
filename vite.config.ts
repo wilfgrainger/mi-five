@@ -17,11 +17,10 @@ export default defineConfig(({mode}) => {
       },
     },
     server: {
-    watch: {
-      ignored: ['**/.wrangler/**']
-    },
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
+      watch: {
+        ignored: ['**/.wrangler/**']
+      },
+      // HMR can be disabled via DISABLE_HMR env var.
       hmr: process.env.DISABLE_HMR !== 'true',
       // Proxy /api calls to the Cloudflare Worker dev server (wrangler dev)
       proxy: {
