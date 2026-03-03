@@ -1,0 +1,15 @@
+name = "spygame-worker"
+main = "worker/src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "spycraft"
+database_id = "REPLACE_AFTER_RUNNING_wrangler_d1_create_spycraft"
+
+[vars]
+APP_ENV = "production"
+
+# Secrets (set via: npx wrangler secret put GEMINI_API_KEY)
+# GEMINI_API_KEY — your Google Gemini API key
