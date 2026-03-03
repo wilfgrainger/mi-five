@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE,
   score INTEGER DEFAULT 0,
   rank TEXT DEFAULT 'Recruit',
+  level INTEGER DEFAULT 1,
   is_pro INTEGER DEFAULT 0,
   stripe_customer_id TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP

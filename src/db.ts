@@ -9,6 +9,7 @@ db.exec(`
     username TEXT UNIQUE,
     score INTEGER DEFAULT 0,
     rank TEXT DEFAULT 'Recruit',
+    level INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 

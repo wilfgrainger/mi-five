@@ -10,6 +10,7 @@ type User = {
   username: string;
   score: number;
   rank: string;
+  level: number;
   is_pro?: number;
 };
 
@@ -255,7 +256,7 @@ export default function App() {
           <div className="flex items-center gap-6">
             <div className="text-right hidden sm:block bg-black/20 px-4 py-2 rounded-xl border border-white/20 shadow-inner">
               <p className="text-sm font-bold text-white tracking-wide">{user.username}</p>
-              <p className="text-[10px] text-violet-400 tracking-normal uppercase mt-1">Rank: {user.rank} | Score: {user.score}</p>
+              <p className="text-[10px] text-violet-400 tracking-normal uppercase mt-1">Level {user.level || 1} | Rank: {user.rank} | Score: {user.score}</p>
             </div>
             <button
               onClick={() => setShowBot(!showBot)}
@@ -333,7 +334,7 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-6 w-full">
                           <div className="bg-black/20 p-4 rounded-2xl border border-white/10 relative overflow-hidden group-hover:border-white/30 transition-colors">
                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-violet-500/20"></div>
                             <p className="text-violet-500 text-[10px] mb-1 tracking-normal font-bold uppercase">Operative Alias</p>
@@ -341,8 +342,13 @@ export default function App() {
                           </div>
                           <div className="bg-black/20 p-4 rounded-2xl border border-white/10 relative overflow-hidden group-hover:border-white/30 transition-colors">
                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500/20"></div>
-                            <p className="text-violet-500 text-[10px] mb-1 tracking-normal font-bold uppercase">Clearance Level</p>
+                            <p className="text-violet-500 text-[10px] mb-1 tracking-normal font-bold uppercase">Clearance Rank</p>
                             <p className="text-xl font-bold text-white tracking-wide">{user.rank}</p>
+                          </div>
+                          <div className="bg-black/20 p-4 rounded-2xl border border-white/10 relative overflow-hidden group-hover:border-white/30 transition-colors">
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-pink-500/20"></div>
+                            <p className="text-violet-500 text-[10px] mb-1 tracking-normal font-bold uppercase">Operative Level</p>
+                            <p className="text-xl font-bold text-white tracking-wide">{user.level || 1}</p>
                           </div>
                           <div className="bg-black/20 p-4 rounded-2xl border border-white/10 relative overflow-hidden group-hover:border-white/30 transition-colors">
                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/20"></div>
@@ -628,7 +634,7 @@ export default function App() {
                                 {u.username}
                                 {u.username === user.username && <span className="text-[10px] bg-violet-500/20 text-violet-200 px-2 py-0.5 rounded border border-white/30 tracking-wide uppercase">You</span>}
                               </p>
-                              <p className="text-xs text-violet-500 font-bold tracking-normal uppercase mt-1">{u.rank}</p>
+                              <p className="text-xs text-violet-500 font-bold tracking-normal uppercase mt-1">Lvl {u.level || 1} • {u.rank}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
