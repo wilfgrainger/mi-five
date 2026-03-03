@@ -140,7 +140,7 @@ app.get('/api/puzzles', authenticate, async (c) => {
       `SELECT * FROM base_puzzles WHERE id NOT IN (
         SELECT puzzle_id FROM solved_puzzles WHERE user_id = ?
        ) AND id NOT IN (
-        SELECT puzzle_id FROM generated_puzzles WHERE user_id = ?
+        SELECT id FROM generated_puzzles WHERE user_id = ?
        ) ORDER BY RANDOM() LIMIT 1`
     ).bind(user.id, user.id).first();
     
@@ -213,8 +213,9 @@ app.post('/api/puzzles/:id/solve', authenticate, async (c) => {
     await c.env.DB.prepare('UPDATE users SET score = score + ? WHERE id = ?').bind(scoreEarned, user.id).run();
     const updatedUser = await c.env.DB.prepare('SELECT score FROM users WHERE id = ?').bind(user.id).first();
     const newRank = calcRank(updatedUser.score);
-    await c.env.DB.prepare('UPDATE users SET rank = ? WHERE id = ?').bind(newRank, user.id).run();
-    return c.json({ correct: true, scoreEarned, newRank });
+    const newLevel = calcLevel(updatedUser.score);
+    await c.env.DB.prepare('UPDATE users SET rank = ?, level = ? WHERE id = ?').bind(newRank, newLevel, user.id).run();
+    return c.json({ correct: true, scoreEarned, newRank, newLevel });
   }
   return c.json({ correct: false });
 });
@@ -225,7 +226,7 @@ app.post('/api/puzzles/:id/solve', authenticate, async (c) => {
 
 app.get('/api/leaderboard', async (c) => {
   const { results } = await c.env.DB.prepare(
-    'SELECT id, username, score, rank FROM users ORDER BY score DESC LIMIT 10'
+    'SELECT id, username, score, rank, level FROM users ORDER BY score DESC LIMIT 10'
   ).all();
   return c.json({ leaderboard: results });
 });
@@ -330,6 +331,11 @@ app.post('/api/challenges/:id/solve', authenticate, async (c) => {
       'INSERT INTO challenge_results (id, challenge_id, user_id, score_earned) VALUES (?, ?, ?, ?)'
     ).bind(crypto.randomUUID(), challengeId, user.id, scoreEarned).run();
     await c.env.DB.prepare('UPDATE users SET score = score + ? WHERE id = ?').bind(scoreEarned, user.id).run();
+
+    const updatedUser = await c.env.DB.prepare('SELECT score FROM users WHERE id = ?').bind(user.id).first();
+    const newRank = calcRank(updatedUser.score);
+    const newLevel = calcLevel(updatedUser.score);
+    await c.env.DB.prepare('UPDATE users SET rank = ?, level = ? WHERE id = ?').bind(newRank, newLevel, user.id).run();
 
     const { results: resultCount } = await c.env.DB.prepare(
       'SELECT COUNT(*) as cnt FROM challenge_results WHERE challenge_id = ?'
@@ -439,6 +445,10 @@ function calcRank(score: number): string {
   if (score >= 500) return 'Special Agent';
   if (score >= 200) return 'Field Agent';
   return 'Recruit';
+}
+
+function calcLevel(score: number): number {
+  return Math.floor(score / 500) + 1;
 }
 
 export default app;
