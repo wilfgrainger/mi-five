@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Terminal, Shield, Lock, Unlock, Trophy, User, LogOut, Send, Crosshair, Cpu, ChevronRight, AlertTriangle, Radio, Globe, Database, ArrowLeft, ArrowRight, CheckCircle2, Swords, Bell, Star, X } from 'lucide-react';
-import LiveSpyBot from './components/LiveSpyBot';
 import { API_BASE } from './lib/api';
+
+const LiveSpyBot = React.lazy(() => import('./components/LiveSpyBot'));
 
 type User = {
   id: string;
@@ -669,6 +670,14 @@ export default function App() {
           </div>
         </main>
       </div>
+
+      <AnimatePresence>
+        {showBot && (
+          <React.Suspense fallback={null}>
+            <LiveSpyBot onClose={() => setShowBot(false)} />
+          </React.Suspense>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {upgradeModal && (

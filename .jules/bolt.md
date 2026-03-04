@@ -1,0 +1,3 @@
+## 2024-05-18 - Lazy-loading React component with suspense and animate presence
+**Learning:** `LiveSpyBot` was a heavy component importing `@google/genai` but wasn't conditionally lazy-loaded, causing initial JS bundle bloat for the SPA. Also it was not in the render tree.
+**Action:** Use `React.lazy()` and `<React.Suspense>` to load the component dynamically, putting the chunk in a separate file to speed up initial page load. Also remember to wrap components that can unmount in Framer Motion's `<AnimatePresence>` if they have exit animations.
