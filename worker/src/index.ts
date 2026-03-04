@@ -114,7 +114,8 @@ app.get('/api/me', authenticate, async (c) => {
 app.post('/api/me/username', authenticate, async (c) => {
   const user: any = c.get('user');
   const { username } = await c.req.json();
-  if (!username || username.length < 3) return c.json({ error: 'Invalid username' }, 400);
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  if (!username || !usernameRegex.test(username)) return c.json({ error: 'Invalid username' }, 400);
   try {
     await c.env.DB.prepare('UPDATE users SET username = ? WHERE id = ?').bind(username, user.id).run();
     return c.json({ message: 'Username updated' });
