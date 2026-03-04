@@ -11,6 +11,16 @@ const SPY_QUOTES = [
   "THE MOLE IS IN THE SYNDICATE"
 ];
 
+const BOOK_CIPHER_TEXT = `The quick brown fox jumps over the lazy dog.
+Agents must remain vigilant at all times.
+Security is our number one priority today.
+Never leave your terminal unlocked or unattended.
+The eagle flies at midnight under the pale moon.
+Trust no one and verify all incoming transmissions.`;
+
+const BOOK_CIPHER_LINES = BOOK_CIPHER_TEXT.split('\n');
+const BOOK_CIPHER_WORDS = BOOK_CIPHER_LINES.map(l => l.split(' ').map(w => w.replace(/[^a-zA-Z]/g, '').toUpperCase()));
+
 export function generateSubstitution(userId: string) {
   const plaintext = SPY_QUOTES[Math.floor(Math.random() * SPY_QUOTES.length)];
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -70,23 +80,13 @@ export function generateScytale(userId: string) {
 }
 
 export function generateBookCipher(userId: string) {
-  const text = `The quick brown fox jumps over the lazy dog.
-Agents must remain vigilant at all times.
-Security is our number one priority today.
-Never leave your terminal unlocked or unattended.
-The eagle flies at midnight under the pale moon.
-Trust no one and verify all incoming transmissions.`;
-  
-  const lines = text.split('\n');
-  const words = lines.map(l => l.split(' '));
-  
   const targetWords = [];
   const coordinates = [];
   
   for (let i = 0; i < 3; i++) {
-    const lineIdx = Math.floor(Math.random() * lines.length);
-    const wordIdx = Math.floor(Math.random() * words[lineIdx].length);
-    targetWords.push(words[lineIdx][wordIdx].replace(/[^a-zA-Z]/g, '').toUpperCase());
+    const lineIdx = Math.floor(Math.random() * BOOK_CIPHER_LINES.length);
+    const wordIdx = Math.floor(Math.random() * BOOK_CIPHER_WORDS[lineIdx].length);
+    targetWords.push(BOOK_CIPHER_WORDS[lineIdx][wordIdx]);
     coordinates.push([lineIdx + 1, wordIdx + 1]); // 1-indexed
   }
 
@@ -98,7 +98,7 @@ Trust no one and verify all incoming transmissions.`;
     description: 'Use the provided reference text and coordinates (Line, Word) to extract the hidden message.',
     difficulty: 'Medium',
     multiplier: 2,
-    puzzle_data: JSON.stringify({ text, coordinates }),
+    puzzle_data: JSON.stringify({ text: BOOK_CIPHER_TEXT, coordinates }),
     answer: targetWords.join(' ')
   };
 }
