@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import { v4 as uuidv4 } from 'uuid';
 import db from './src/db.js';
 import { generateRandomPuzzle } from './src/puzzleGenerator.js';
+import { checkAnswer, calcRank, calcLevel } from './src/lib/gameLogic';
 
 async function startServer() {
   const app = express();
@@ -145,37 +146,7 @@ async function startServer() {
     if (!puzzle) return res.status(404).json({ error: 'Puzzle not found' });
     if (puzzle.solved) return res.status(400).json({ error: 'Already solved' });
 
-    let isCorrect = false;
-
-    if (puzzle.type === 'map_coloring') {
-      try {
-        const coloring = typeof answer === 'string' ? JSON.parse(answer) : answer;
-        const data = JSON.parse(puzzle.puzzle_data);
-        const edges = data.edges;
-        
-        let valid = true;
-        let colorsUsed = new Set();
-        
-        for (const [u, v] of edges) {
-          if (coloring[u] === undefined || coloring[v] === undefined) {
-            valid = false; break;
-          }
-          if (coloring[u] === coloring[v]) {
-            valid = false; break;
-          }
-          colorsUsed.add(coloring[u]);
-          colorsUsed.add(coloring[v]);
-        }
-        
-        if (valid && colorsUsed.size <= 4) {
-          isCorrect = true;
-        }
-      } catch (e) {
-        isCorrect = false;
-      }
-    } else {
-      isCorrect = answer.trim().toLowerCase() === puzzle.answer.toLowerCase();
-    }
+    const isCorrect = checkAnswer(puzzle, answer);
 
     if (isCorrect) {
       const baseScore = 100;
@@ -184,18 +155,16 @@ async function startServer() {
       db.prepare('UPDATE generated_puzzles SET solved = 1 WHERE id = ?').run(id);
       db.prepare('INSERT INTO solved_puzzles (user_id, puzzle_id, score_earned) VALUES (?, ?, ?)').run(req.user.id, id, scoreEarned);
       
-      // Update user score and rank
+      // Update user score, rank and level
       db.prepare('UPDATE users SET score = score + ? WHERE id = ?').run(scoreEarned, req.user.id);
       
       const user = db.prepare('SELECT score FROM users WHERE id = ?').get(req.user.id) as any;
-      let newRank = 'Recruit';
-      if (user.score >= 1000) newRank = 'Director';
-      else if (user.score >= 500) newRank = 'Special Agent';
-      else if (user.score >= 200) newRank = 'Field Agent';
+      const newRank = calcRank(user.score);
+      const newLevel = calcLevel(user.score);
       
-      db.prepare('UPDATE users SET rank = ? WHERE id = ?').run(newRank, req.user.id);
+      db.prepare('UPDATE users SET rank = ?, level = ? WHERE id = ?').run(newRank, newLevel, req.user.id);
 
-      res.json({ correct: true, scoreEarned, newRank });
+      res.json({ correct: true, scoreEarned, newRank, newLevel });
     } else {
       res.json({ correct: false });
     }
@@ -276,30 +245,17 @@ async function startServer() {
     if (alreadySolved) return res.status(400).json({ error: 'Already solved this challenge' });
 
     const puzzleData = JSON.parse(challenge.puzzle_data);
-    let isCorrect = false;
-
-    if (puzzleData.type === 'map_coloring') {
-      try {
-        const coloring = typeof answer === 'string' ? JSON.parse(answer) : answer;
-        const data = JSON.parse(puzzleData.puzzle_data);
-        const edges = data.edges;
-        let valid = true;
-        let colorsUsed = new Set();
-        for (const [u, v] of edges) {
-          if (coloring[u] === undefined || coloring[v] === undefined) { valid = false; break; }
-          if (coloring[u] === coloring[v]) { valid = false; break; }
-          colorsUsed.add(coloring[u]); colorsUsed.add(coloring[v]);
-        }
-        if (valid && colorsUsed.size <= 4) isCorrect = true;
-      } catch { isCorrect = false; }
-    } else {
-      isCorrect = answer.trim().toLowerCase() === puzzleData.answer.toLowerCase();
-    }
+    const isCorrect = checkAnswer({ type: puzzleData.type, puzzle_data: puzzleData.puzzle_data, answer: puzzleData.answer }, answer);
 
     if (isCorrect) {
       const scoreEarned = 100 * (puzzleData.multiplier || 1);
       db.prepare('INSERT INTO challenge_results (id, challenge_id, user_id, score_earned) VALUES (?, ?, ?, ?)').run(uuidv4(), id, req.user.id, scoreEarned);
       db.prepare('UPDATE users SET score = score + ? WHERE id = ?').run(scoreEarned, req.user.id);
+
+      const user = db.prepare('SELECT score FROM users WHERE id = ?').get(req.user.id) as any;
+      const newRank = calcRank(user.score);
+      const newLevel = calcLevel(user.score);
+      db.prepare('UPDATE users SET rank = ?, level = ? WHERE id = ?').run(newRank, newLevel, req.user.id);
 
       // Mark challenge complete if both players have responded
       const resultCount = db.prepare('SELECT COUNT(*) as cnt FROM challenge_results WHERE challenge_id = ?').get(id) as any;
