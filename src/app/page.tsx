@@ -42,34 +42,31 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-black/20 text-violet-300 font-sans selection:bg-violet-500 selection:text-black overflow-hidden relative">
+    <div className="min-h-screen bg-transparent text-slate-200 font-sans selection:bg-violet-500 selection:text-black overflow-hidden relative">
+      <div className="scanline"></div>
+      
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-violet-900/20 blur-[120px] rounded-full mix-blend-screen"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-900/20 blur-[150px] rounded-full mix-blend-screen"></div>
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
-
-        {/* Scanning Line */}
-        <motion.div
-          className="absolute left-0 right-0 h-[2px] bg-violet-500/30 shadow-2xl shadow-violet-500/40"
-          animate={{ top: ['-10%', '110%'] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-        />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-900/10 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-900/10 blur-[120px] rounded-full"></div>
       </div>
 
       <div className="relative z-10 flex flex-col h-screen">
         {/* Header */}
-        <header className="border-b border-white/20 p-4 flex justify-between items-center bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(31,38,135,0.15)]">
+        <header className="border-b border-white/10 p-4 flex justify-between items-center bg-black/40 backdrop-blur-2xl">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-violet-500 blur-md opacity-40 rounded-full"></div>
-              <div className="p-2.5 bg-black/20 rounded-full border border-white/50 relative z-10">
-                <Shield className="w-6 h-6 text-violet-300" />
+              <div className="absolute inset-0 bg-violet-500 blur-md opacity-20 rounded-full"></div>
+              <div className="p-2.5 bg-slate-900/50 rounded-lg border border-white/20 relative z-10">
+                <Shield className="w-6 h-6 text-violet-400" />
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-normal text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] uppercase">MI6 <span className="text-violet-400 font-light">|</span> Q-Branch</h1>
-              <p className="text-[10px] text-violet-300/80 font-bold tracking-widest uppercase mt-0.5">Secure Operative Terminal</p>
+              <h1 className="text-xl font-bold tracking-tight text-white uppercase font-mono-spy">Q-BRANCH <span className="text-violet-500 font-light">//</span> TERMINAL</h1>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <p className="text-[10px] text-emerald-500 font-bold tracking-[0.2em] uppercase">Secure Connection Active</p>
+              </div>
             </div>
           </div>
 
