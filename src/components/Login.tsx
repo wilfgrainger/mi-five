@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Shield, Send, AlertTriangle } from 'lucide-react';
+import { Shield, Send, AlertTriangle, Terminal } from 'lucide-react';
 import { useGameState } from '@/contexts/GameStateContext';
 
 export default function Login() {
@@ -13,14 +13,9 @@ export default function Login() {
   const handleRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
-    try {
-      // Since we're pure client-side, we simulate the "magic link" by logging in immediately after a short delay
-      setTimeout(() => {
-        setStatus('sent');
-      }, 1000);
-    } catch (e) {
-      setStatus('error');
-    }
+    setTimeout(() => {
+      setStatus('sent');
+    }, 1500);
   };
 
   const handleSimulateClick = () => {
@@ -28,71 +23,83 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-white flex items-center justify-center font-sans p-4">
-      <div className="max-w-md w-full border border-white/10 bg-black/40 backdrop-blur-2xl p-8 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative overflow-hidden">
-        {/* Scanline effect */}
-        <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none opacity-20"></div>
+    <div className="min-h-screen bg-[#020617] text-slate-200 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      <div className="scanline"></div>
+      
+      {/* Background Grid */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none" 
+           style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
+      </div>
 
-        <div className="flex justify-center mb-8">
-          <Shield className="w-16 h-16 text-violet-300" />
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-md w-full glass-panel p-8 rounded-2xl relative z-10"
+      >
+        <div className="flex flex-col items-center mb-8">
+          <div className="p-4 bg-slate-900 rounded-xl border border-white/10 mb-4 relative">
+            <div className="absolute inset-0 bg-violet-500 blur-lg opacity-20"></div>
+            <Shield className="w-12 h-12 text-violet-400 relative z-10" />
+          </div>
+          <h1 className="text-xl font-black tracking-[0.3em] uppercase font-mono-spy text-white">Handshake Protocol</h1>
+          <p className="text-[10px] text-violet-500 font-bold tracking-widest uppercase mt-2">Level 4 Encryption Active</p>
         </div>
 
-        <h1 className="text-2xl font-bold text-center mb-2 tracking-wide uppercase">MI5 Secure Login</h1>
-        <p className="text-center text-violet-400 text-sm mb-8 uppercase tracking-widest">Authorized Personnel Only</p>
-
         {status === 'idle' || status === 'error' ? (
-          <form onSubmit={handleRequest} className="space-y-4 relative z-10">
-            {status === 'error' && (
-              <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded text-sm flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" /> ACCESS DENIED. TRY AGAIN.
-              </div>
-            )}
+          <form onSubmit={handleRequest} className="space-y-6">
             <div>
-              <label className="block text-xs text-violet-400 mb-1 uppercase tracking-wider">Agent Email</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-3 text-violet-300 focus:outline-none focus:border-violet-400/50 focus:bg-white/5 transition-all shadow-inner"
-                placeholder="agent@mi5.gov.uk"
-              />
+              <label className="block text-[10px] font-mono-spy text-slate-500 uppercase tracking-widest mb-2">Operative Identifier (Email)</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Terminal className="h-4 w-4 text-slate-600" />
+                </div>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-black/40 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-sm font-mono-spy focus:outline-none focus:border-violet-500/50 transition-all text-violet-100 placeholder:text-slate-700"
+                  placeholder="agent@qbranch.gov"
+                />
+              </div>
             </div>
             <button
               type="submit"
-              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-violet-300 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] uppercase tracking-widest"
+              className="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 rounded-lg transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.3)]"
             >
-              <Send className="w-4 h-4" /> Request Access Link
+              <Send className="w-4 h-4" /> Initialize Connection
             </button>
           </form>
         ) : status === 'loading' ? (
-          <div className="text-center py-8">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-              className="inline-block w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full mb-4"
-            />
-            <p className="uppercase tracking-widest text-xs">Transmitting Request...</p>
+          <div className="text-center py-12">
+            <div className="w-12 h-12 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <p className="font-mono-spy text-[10px] uppercase tracking-widest animate-pulse">Establishing Secure Tunnel...</p>
           </div>
         ) : (
-          <div className="text-center space-y-6 relative z-10">
-            <div className="bg-black/40 border border-white/10 p-4 rounded-xl shadow-inner">
-              <p className="mb-2 uppercase tracking-widest text-xs">Magic Link Transmitted To:</p>
-              <p className="font-bold text-violet-300">{email}</p>
+          <div className="text-center space-y-8 py-4">
+            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              <p className="text-[10px] font-mono-spy text-emerald-500 uppercase tracking-widest mb-2">Token Transmitted</p>
+              <p className="font-bold text-white tracking-tight">{email}</p>
             </div>
-
-            <div className="border-t border-dashed border-white/20 pt-6">
-              <p className="text-xs text-violet-400 mb-4 uppercase tracking-wider font-bold">Verification simulated for prototype purposes:</p>
+            <div className="space-y-4">
+              <p className="text-[9px] text-slate-500 uppercase tracking-[0.2em] leading-relaxed">
+                Verification required. Access the link sent to your operative device to proceed.
+              </p>
               <button
                 onClick={handleSimulateClick}
-                className="w-full bg-violet-500 text-black font-bold py-3 rounded-xl hover:bg-violet-400 transition-all shadow-[0_0_20px_rgba(139,92,246,0.4)] uppercase tracking-widest"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-all uppercase tracking-widest text-[10px]"
               >
-                Simulate Email Click
+                Simulate Secure Callback
               </button>
             </div>
           </div>
         )}
-      </div>
+
+        <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center opacity-40">
+          <span className="text-[8px] font-mono-spy uppercase">Status: Awaiting_Auth</span>
+          <span className="text-[8px] font-mono-spy uppercase">System: Q_OS_v2.4</span>
+        </div>
+      </motion.div>
     </div>
   );
 }

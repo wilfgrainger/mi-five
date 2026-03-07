@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Swords, CheckCircle2, AlertTriangle, Crosshair } from 'lucide-react';
+import { Terminal, Swords, CheckCircle2, AlertTriangle, Crosshair, Cpu } from 'lucide-react';
 import { useGameState, Challenge } from '@/contexts/GameStateContext';
 
 export default function ChallengeSolver({ challenge, onSolved }: { challenge: Challenge; onSolved: () => void }) {
@@ -43,87 +43,82 @@ export default function ChallengeSolver({ challenge, onSolved }: { challenge: Ch
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-black/20 border border-white/10 p-6 rounded-xl font-sans text-lg leading-relaxed shadow-inner text-violet-100">
+    <div className="space-y-10">
+      <div className="flex items-center gap-4 p-4 bg-red-500/10 border-l-2 border-red-500 rounded-r-lg">
+        <Swords className="w-6 h-6 text-red-500" />
+        <div>
+          <p className="text-[10px] font-mono-spy text-red-500/60 uppercase tracking-[0.2em]">Intercepted Challenge</p>
+          <p className="text-sm font-bold text-white uppercase tracking-tight">Origin: {challenge.challenger_name}</p>
+        </div>
+      </div>
+
+      <div className="p-6 bg-black/40 border border-white/5 rounded-xl font-mono-spy text-sm leading-relaxed text-slate-300">
+        <span className="text-red-500 mr-2 opacity-50">&gt;</span>
         {puzzle.description}
       </div>
 
       {/* Puzzle Data Display */}
-      {puzzle.type === 'substitution' && (
-        <div className="bg-black/20 border border-white/10 p-6 rounded-xl font-sans text-xl tracking-widest text-center break-all shadow-inner text-white">
+      {puzzle.type === 'substitution' && puzzleDataParsed.encryptedText && (
+        <div className="bg-red-950/20 border border-red-500/20 p-8 rounded-xl font-mono-spy text-xl tracking-[0.3em] text-center text-red-100 break-all shadow-[inset_0_0_20px_rgba(239,68,68,0.1)]">
           {puzzleDataParsed.encryptedText}
         </div>
       )}
+
       {puzzle.type === 'book' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-black/20 border border-white/10 p-4 rounded-xl text-sm leading-relaxed shadow-inner">
+          <div className="bg-black/40 border border-white/5 p-6 rounded-xl text-xs font-mono-spy leading-relaxed h-48 overflow-y-auto custom-scrollbar">
             {puzzleDataParsed.text?.split('\n').map((line: string, i: number) => (
-              <div key={i} className="flex gap-4"><span className="text-violet-400 opacity-50 w-6 text-right font-bold">{i + 1}</span><span className="text-violet-100">{line}</span></div>
+              <div key={i} className="flex gap-4 mb-1">
+                <span className="text-red-500 opacity-30 w-4 text-right select-none">{i + 1}</span>
+                <span className="text-slate-400">{line}</span>
+              </div>
             ))}
           </div>
-          <div className="bg-black/20 border border-white/10 p-4 rounded-xl shadow-inner">
-            <h3 className="text-[10px] text-violet-400 mb-4 uppercase font-black tracking-widest">Target Coordinates [Line, Word]</h3>
-            {puzzleDataParsed.coordinates?.map((coord: number[], i: number) => (
-              <div key={i} className="text-lg font-bold tracking-widest text-violet-300">[{coord[0]}, {coord[1]}]</div>
-            ))}
+          <div className="glass-panel p-6 rounded-xl flex flex-col justify-center items-center border-red-500/20">
+            <h3 className="text-[10px] font-mono-spy text-red-500 mb-4 uppercase tracking-[0.2em]">Target Vectors</h3>
+            <div className="space-y-2">
+              {puzzleDataParsed.coordinates?.map((coord: number[], i: number) => (
+                <div key={i} className="text-2xl font-black tracking-tighter text-white font-mono-spy">[{coord[0]} : {coord[1]}]</div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-      {puzzle.type === 'map_coloring' && (
-        <div className="bg-black/40 border border-white/10 rounded-xl p-4 relative h-64 overflow-hidden shadow-inner">
-          <svg className="w-full h-full absolute inset-0">
-            {puzzleDataParsed.edges?.map((edge: string[], i: number) => {
-              const n1 = puzzleDataParsed.nodes.find((n: any) => n.id === edge[0]);
-              const n2 = puzzleDataParsed.nodes.find((n: any) => n.id === edge[1]);
-              return <line key={i} x1={`${n1.x}%`} y1={`${n1.y}%`} x2={`${n2.x}%`} y2={`${n2.y}%`} stroke="rgba(239,68,68,0.3)" strokeWidth="2" />;
-            })}
-          </svg>
-          {puzzleDataParsed.nodes?.map((node: any) => {
-            const colorIdx = coloring[node.id] || 0;
-            const colors = ['transparent', '#ef4444', '#3b82f6', '#22c55e', '#eab308'];
-            return (
-              <button key={node.id} type="button"
-                onClick={() => setColoring({ ...coloring, [node.id]: (colorIdx + 1) % 5 })}
-                className="absolute w-10 h-10 -ml-5 -mt-5 rounded-full border-2 border-red-500 flex items-center justify-center font-bold z-10"
-                style={{ left: `${node.x}%`, top: `${node.y}%`, backgroundColor: colors[colorIdx], color: colorIdx === 0 ? '#ef4444' : '#000' }}
-              >{node.id}</button>
-            );
-          })}
         </div>
       )}
 
       {/* Answer Form */}
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-6">
         {status === 'correct' ? (
-          <div className="text-center py-6">
-            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-            <p className="text-emerald-400 font-bold text-lg uppercase tracking-widest">Challenge Complete</p>
-            <p className="text-violet-400 text-sm mt-1 uppercase tracking-widest">+{scoreEarned} Intel Points Earned</p>
+          <div className="text-center py-6 space-y-2">
+            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-4 animate-bounce" />
+            <p className="text-emerald-400 font-black text-xl uppercase tracking-tighter glow-text-emerald">Target Neutralized</p>
+            <p className="text-[10px] font-mono-spy text-emerald-500/60 uppercase tracking-[0.2em]">+{scoreEarned} Intel Points Secure</p>
           </div>
         ) : (
           <>
             {puzzle.type !== 'map_coloring' && (
-              <div className="mb-4">
-                <label className="block text-[10px] text-red-400 font-bold tracking-widest uppercase mb-3 text-center">Submit Decryption Key</label>
+              <div className="space-y-2">
+                <label className="block text-[8px] font-mono-spy text-red-500/60 uppercase tracking-[0.3em] text-center">Encryption Override Input</label>
                 <input
                   type="text"
                   required
+                  autoFocus
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
                   disabled={status === 'checking'}
-                  className={`w-full bg-black/20 border-2 rounded-xl py-4 px-4 text-xl text-center uppercase tracking-widest focus:outline-none transition-all shadow-inner font-sans ${status === 'incorrect' ? 'border-red-500/80 bg-red-900/20 text-red-400' : 'border-red-500/30 focus:border-red-400/60 text-white'
-                    }`}
-                  placeholder="..."
+                  className={`w-full bg-black/60 border-2 rounded-xl py-5 px-4 text-2xl text-center uppercase tracking-[0.2em] font-mono-spy focus:outline-none transition-all ${
+                    status === 'incorrect' ? 'border-red-500 text-red-400' : 'border-red-500/30 text-white focus:border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.05)]'
+                  }`}
+                  placeholder="---"
                 />
               </div>
             )}
             <button
               type="submit"
               disabled={status === 'checking'}
-              className="w-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
+              className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl transition-all flex items-center justify-center gap-3 tracking-[0.2em] uppercase text-xs shadow-[0_0_30px_rgba(239,68,68,0.2)]"
             >
               <Swords className="w-4 h-4" />
-              {status === 'checking' ? 'Verifying...' : status === 'incorrect' ? 'Incorrect - Retry' : 'Submit Answer'}
+              {status === 'checking' ? 'Processing...' : status === 'incorrect' ? 'Override Failed - Retry' : 'Execute Override'}
             </button>
           </>
         )}
