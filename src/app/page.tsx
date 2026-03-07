@@ -274,41 +274,48 @@ export default function Home() {
 
                   {/* Challenges Inbox */}
                   {(challenges.incoming.length > 0 || challenges.outgoing.length > 0) && (
-                    <div>
-                      <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-sm font-bold flex items-center gap-3 text-violet-200 tracking-widest uppercase">
-                          <div className="p-1.5 bg-red-500/10 rounded border border-red-500/20">
-                            <Swords className="w-4 h-4 text-red-400" />
-                          </div>
-                          Agent Challenges
-                        </h2>
-                        <div className="h-[1px] flex-1 bg-gradient-to-r from-red-500/20 to-transparent ml-4"></div>
+                    <div className="space-y-6 text-slate-300">
+                      <div className="flex items-center gap-4">
+                        <div className="h-[1px] w-8 bg-red-500/40"></div>
+                        <h2 className="text-[10px] font-technical font-bold text-red-500 uppercase tracking-[0.3em]">Intercepted_Challenges_Queue</h2>
+                        <div className="h-[1px] flex-1 bg-white/5"></div>
                       </div>
-                      <div className="space-y-3">
+                      
+                      <div className="grid grid-cols-1 gap-4">
                         {challenges.incoming.map(c => (
-                          <div key={c.id} className={`border rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 backdrop-blur-xl ${c.status === 'pending' ? 'border-red-500/30 bg-red-900/10' : 'border-white/20 bg-white/5 opacity-70'
-                            }`}>
-                            <div>
-                              <p className="text-xs text-red-400 font-bold uppercase tracking-widest mb-1">Incoming Challenge</p>
-                              <p className="font-bold text-white uppercase tracking-wide">{c.challenger_name} <span className="text-violet-400 font-normal normal-case">has challenged you to crack:</span></p>
-                              <p className="text-sm text-violet-300 mt-1 font-bold">{c.puzzle_data.title} <span className="text-violet-500 text-xs font-normal">({c.puzzle_data.difficulty})</span></p>
-                              {c.status !== 'pending' && (
-                                <div className="mt-2 flex gap-3">
-                                  {c.results.map((r: any) => (
-                                    <span key={r.user_id} className="text-xs text-violet-400 uppercase tracking-widest">{r.username}: <span className="text-violet-200 font-bold">{r.score_earned} Pts</span></span>
-                                  ))}
+                          <div key={c.id} className={`workstation-panel rounded p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden ${c.status === 'pending' ? 'border-l-4 border-l-red-600' : 'opacity-50 grayscale'}`}>
+                            {c.status === 'pending' && <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/5 -mr-16 -mt-16 rounded-full blur-2xl"></div>}
+                            
+                            <div className="flex items-center gap-6 relative z-10">
+                              <div className={`p-3 rounded border ${c.status === 'pending' ? 'border-red-500/20 bg-red-600/10' : 'border-white/5 bg-black/40'}`}>
+                                <Swords className={`w-6 h-6 ${c.status === 'pending' ? 'text-red-500 animate-pulse' : 'text-slate-600'}`} />
+                              </div>
+                              <div>
+                                <p className="text-[8px] font-technical font-black text-red-500/60 uppercase tracking-widest mb-1">Source: {c.challenger_name}</p>
+                                <p className="text-white font-bold text-sm uppercase tracking-tight">Direct_Encryption_Challenge</p>
+                                <div className="flex gap-3 mt-2">
+                                  <span className="text-[9px] font-technical text-slate-500">MISSION: {c.puzzle_data.title}</span>
+                                  <span className="text-slate-700">|</span>
+                                  <span className="text-[9px] font-technical text-slate-500">CLASS: {c.puzzle_data.difficulty}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-4 relative z-10 w-full sm:w-auto">
+                              {c.status === 'pending' ? (
+                                <button
+                                  onClick={() => { setActiveChallenge(c); setView('challenge'); }}
+                                  className="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white font-technical font-black text-[10px] px-8 py-3 rounded transition-all uppercase tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.2)]"
+                                >
+                                  Accept_Bypass
+                                </button>
+                              ) : (
+                                <div className="text-right">
+                                  <p className="text-[8px] font-technical text-slate-600 uppercase mb-1">Status</p>
+                                  <span className="text-[10px] font-technical font-bold text-slate-400 uppercase border border-white/5 px-3 py-1 rounded bg-black/40">{c.status}</span>
                                 </div>
                               )}
                             </div>
-                            {c.status === 'pending' && !c.results.find((r: any) => r.user_id === user?.id) && (
-                              <button
-                                onClick={() => { setActiveChallenge(c); setView('challenge'); }}
-                                className="flex-shrink-0 flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-xs px-5 py-2.5 rounded-xl transition-all uppercase tracking-widest"
-                              >
-                                <Swords className="w-4 h-4" /> Accept
-                              </button>
-                            )}
-                            {c.status !== 'pending' && <span className="text-[10px] text-violet-500 uppercase font-bold tracking-widest border border-white/20 px-3 py-1 rounded-full">{c.status}</span>}
                           </div>
                         ))}
                       </div>
@@ -323,27 +330,16 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="max-w-4xl mx-auto"
+                  className="max-w-5xl mx-auto"
                 >
                   <button
                     onClick={() => setView('dashboard')}
-                    className="mb-6 flex items-center gap-2 text-violet-400 hover:text-violet-200 text-xs font-bold tracking-widest uppercase transition-colors"
+                    className="mb-8 flex items-center gap-3 text-slate-500 hover:text-red-500 text-[10px] font-technical font-bold uppercase transition-colors group"
                   >
-                    <ArrowLeft className="w-4 h-4" /> Back to Briefing
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
+                    Terminate_Bypass_Session
                   </button>
-                  <div className="border border-red-500/30 bg-red-900/10 backdrop-blur-3xl rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(239,68,68,0.1)] relative">
-                    <div className="h-1 w-full bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-50"></div>
-                    <div className="p-6 border-b border-red-500/20 bg-black/20">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="p-1.5 bg-red-500/20 rounded border border-red-500/30">
-                          <Swords className="w-5 h-5 text-red-400" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-red-400 font-bold uppercase tracking-widest">Challenge from {activeChallenge.challenger_name}</p>
-                          <h2 className="text-2xl font-black text-white tracking-widest uppercase">{activeChallenge.puzzle_data.title}</h2>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="workstation-panel rounded-lg overflow-hidden border-t-2 border-t-red-600 shadow-2xl relative">
                     <div className="p-8">
                       <ChallengeSolver
                         challenge={activeChallenge}
@@ -362,13 +358,14 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="max-w-4xl mx-auto"
+                  className="max-w-5xl mx-auto"
                 >
                   <button
                     onClick={() => setView('dashboard')}
-                    className="mb-6 flex items-center gap-2 text-violet-400 hover:text-violet-200 text-xs font-bold tracking-widest uppercase transition-colors"
+                    className="mb-8 flex items-center gap-3 text-slate-500 hover:text-blue-400 text-[10px] font-technical font-bold uppercase transition-colors group"
                   >
-                    <ArrowLeft className="w-4 h-4" /> Abort Mission
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
+                    Return_to_Operational_Files
                   </button>
 
                   <PuzzleSolver
@@ -383,79 +380,101 @@ export default function Home() {
               {view === 'leaderboard' && (
                 <motion.div
                   key="leaderboard"
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="max-w-4xl mx-auto"
+                  exit={{ opacity: 0, y: -10 }}
+                  className="max-w-5xl mx-auto space-y-8"
                 >
-                  <div className="border border-white/20 bg-white/5 backdrop-blur-3xl rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-                    <div className="p-6 border-b border-white/20 bg-black/20 flex items-center justify-between">
+                  <div className="workstation-panel rounded-lg overflow-hidden border-t-2 border-t-blue-600 shadow-2xl">
+                    <div className="p-6 border-b border-white/5 bg-black/40 flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="p-2.5 bg-violet-500/10 rounded-xl border border-white/30 relative overflow-hidden">
-                          <div className="absolute inset-0 bg-violet-500/20 animate-pulse"></div>
-                          <Globe className="w-6 h-6 text-violet-300 relative z-10" />
+                        <div className="p-2.5 bg-blue-600/10 rounded border border-blue-500/20">
+                          <Globe className="w-6 h-6 text-blue-500 animate-pulse-soft" />
                         </div>
                         <div>
-                          <h2 className="font-black text-xl text-white tracking-widest uppercase">Global Intelligence Network</h2>
-                          <p className="text-[10px] text-violet-400 font-bold tracking-widest uppercase mt-1">Live Operative Rankings</p>
+                          <h2 className="font-black text-lg text-white tracking-widest uppercase font-technical leading-none">Global_Intelligence_Network</h2>
+                          <p className="text-[9px] text-blue-500/60 font-technical font-bold uppercase mt-2 tracking-tighter">Live_Operative_Registry // Verified_Assets_Only</p>
                         </div>
+                      </div>
+                      <div className="flex items-center gap-3 bg-black/40 px-4 py-2 rounded border border-white/5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span className="text-[9px] font-technical font-bold text-slate-500 uppercase">Uplink_Encrypted</span>
                       </div>
                     </div>
 
-                    <div className="divide-y divide-white/10">
+                    <div className="divide-y divide-white/5 bg-black/20">
+                      <div className="grid grid-cols-12 p-4 text-[8px] font-technical font-black text-slate-600 uppercase tracking-[0.2em]">
+                        <div className="col-span-1 pl-4">Pos</div>
+                        <div className="col-span-5">Operative_Identifier</div>
+                        <div className="col-span-3">Classification</div>
+                        <div className="col-span-3 text-right pr-4">Intel_Yield</div>
+                      </div>
+                      
                       {leaderboard.map((u, i) => (
                         <div
                           key={u.id}
-                          className={`p-6 flex items-center justify-between transition-colors relative overflow-hidden ${u.id === user.id ? 'bg-violet-900/20' : 'hover:bg-black/20'}`}
+                          className={`grid grid-cols-12 p-6 items-center transition-all relative overflow-hidden group ${u.id === user.id ? 'bg-blue-600/5' : 'hover:bg-white/[0.02]'}`}
                         >
                           {u.id === user.id && (
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.8)]"></div>
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
                           )}
-                          <div className="flex items-center gap-6">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${i === 0 ? 'border-yellow-400/50 bg-yellow-400/10 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)]' :
-                              i === 1 ? 'border-gray-300/50 bg-gray-300/10 text-gray-300' :
-                                i === 2 ? 'border-amber-600/50 bg-amber-600/10 text-amber-500' :
-                                  'border-white/10 bg-black/20 text-violet-500'
-                              }`}>
-                              <span className="font-black text-lg">{i + 1}</span>
+                          
+                          <div className="col-span-1 pl-4">
+                            <span className={`text-lg font-black font-technical ${i === 0 ? 'text-warning glow-amber' : i === 1 ? 'text-slate-300' : i === 2 ? 'text-orange-600' : 'text-slate-600'}`}>
+                              {String(i + 1).padStart(2, '0')}
+                            </span>
+                          </div>
+                          
+                          <div className="col-span-5 flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded border ${u.id === user.id ? 'border-blue-500/30' : 'border-white/5'} bg-black/40 flex items-center justify-center relative overflow-hidden`}>
+                              <User className={`w-5 h-5 ${u.id === user.id ? 'text-blue-400' : 'text-slate-700'}`} />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                             </div>
                             <div>
-                              <p className="font-bold text-lg text-white tracking-wide flex items-center gap-3">
+                              <p className="font-bold text-sm text-white tracking-tight flex items-center gap-3 uppercase">
                                 {u.username}
-                                {u.id === user.id && <span className="text-[10px] bg-violet-500/20 text-violet-200 px-2 py-0.5 rounded border border-white/30 tracking-widest uppercase">You</span>}
+                                {u.id === user.id && <span className="text-[7px] font-technical bg-blue-600 text-white px-1.5 py-0.5 rounded tracking-tighter">YOU</span>}
                               </p>
-                              <p className="text-xs text-violet-500 font-bold tracking-widest uppercase mt-1">Lvl {u.level || 1} • {u.rank}</p>
+                              <p className="text-[8px] text-slate-600 font-technical uppercase mt-1 tracking-tighter leading-none">ID_{u.id.substring(0,8).toUpperCase()}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-4">
-                            {u.id !== user.id && (
-                              <button
-                                onClick={() => {
-                                    sendChallenge(u.id);
-                                    setChallengeSending(u.id);
-                                    setTimeout(() => setChallengeSending(null), 1000);
-                                }}
-                                disabled={challengeSending === u.id}
-                                className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold text-[10px] px-4 py-2 rounded-xl transition-all uppercase tracking-widest disabled:opacity-50"
-                              >
-                                <Swords className="w-3.5 h-3.5" />
-                                {challengeSending === u.id ? 'Sending...' : 'Challenge'}
-                              </button>
-                            )}
-                            <div className="text-right bg-black/20 px-5 py-3 rounded-2xl border border-white/20 shadow-inner">
-                              <p className="font-black text-2xl text-violet-300 drop-shadow-[0_0_8px_rgba(139,92,246,0.5)] leading-none">{u.score}</p>
-                              <p className="text-[9px] text-violet-500 tracking-widest font-bold uppercase mt-1">Intel Pts</p>
+                          
+                          <div className="col-span-3">
+                            <p className="text-[10px] font-technical font-black text-blue-500/80 uppercase">{u.rank}</p>
+                            <p className="text-[8px] text-slate-600 font-technical mt-1 uppercase tracking-tighter">LVL_{u.level || 1}</p>
+                          </div>
+                          
+                          <div className="col-span-3 text-right pr-4">
+                            <div className="inline-block bg-black/40 px-4 py-2 rounded border border-white/5 group-hover:border-blue-500/20 transition-colors">
+                              <p className="font-black text-xl text-emerald-500 tracking-tighter leading-none">{u.score}</p>
+                              <p className="text-[7px] text-slate-600 font-technical uppercase mt-1 tracking-widest font-black leading-none">Yield_PTS</p>
                             </div>
                           </div>
                         </div>
                       ))}
+                      
                       {leaderboard.length === 0 && (
-                        <div className="p-16 flex flex-col items-center justify-center text-violet-500/50">
-                          <Database className="w-12 h-12 mb-4 opacity-20" />
-                          <p className="tracking-widest font-bold uppercase text-sm">No Operative Data Available</p>
+                        <div className="p-24 flex flex-col items-center justify-center text-slate-700 opacity-20">
+                          <Database className="w-16 h-16 mb-6" />
+                          <p className="font-technical font-black uppercase text-xs tracking-[0.4em]">No_Registry_Data</p>
                         </div>
                       )}
                     </div>
+                  </div>
+                  
+                  {/* System Footer Readout */}
+                  <div className="flex justify-between items-center px-4 opacity-30">
+                    <div className="flex gap-8">
+                      <div className="flex flex-col">
+                        <span className="text-[7px] font-technical font-black uppercase text-slate-500">Node_Sync</span>
+                        <span className="text-[9px] font-technical font-bold text-emerald-500">STABLE</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[7px] font-technical font-black uppercase text-slate-500">Registry_Size</span>
+                        <span className="text-[9px] font-technical font-bold text-blue-400">{leaderboard.length}_ASSETS</span>
+                      </div>
+                    </div>
+                    <p className="text-[7px] font-technical font-black uppercase text-slate-500">Access_Log: [0x7F_SESSION_ACTIVE]</p>
                   </div>
                 </motion.div>
               )}
