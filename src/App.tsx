@@ -875,7 +875,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
     e.preventDefault();
     setStatus('loading');
     try {
-      const res = await fetch('/api/auth/request', {
+      const res = await fetch(`${API_BASE}/api/auth/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -899,7 +899,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
       const token = url.searchParams.get('token');
 
       if (token) {
-        const res = await fetch('/api/auth/verify', {
+        const res = await fetch(`${API_BASE}/api/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token })
@@ -1007,7 +1007,7 @@ function PuzzleSolver({ puzzle, onSolved }: { puzzle: Puzzle, onSolved: () => vo
     setStatus('checking');
     try {
       const token = localStorage.getItem('mi5_token');
-      const res = await fetch(`/api/puzzles/${puzzle.id}/solve`, {
+      const res = await fetch(`${API_BASE}/api/puzzles/${puzzle.id}/solve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
