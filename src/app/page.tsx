@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Shield, Lock, Unlock, User, LogOut, Crosshair, 
   Terminal, ChevronRight, Globe, Database, ArrowLeft, 
-  CheckCircle2, Swords, Radio, X, Star, Download, Upload
+  CheckCircle2, Swords, Radio, X, Star, Download, Upload, RefreshCw
 } from 'lucide-react';
 import { useGameState, Puzzle, Challenge } from '@/contexts/GameStateContext';
 import { PUZZLE_THEMES } from '@/lib/puzzles';
@@ -14,7 +14,7 @@ import PuzzleSolver from '@/components/PuzzleSolver';
 import ChallengeSolver from '@/components/ChallengeSolver';
 
 export default function Home() {
-  const { user, puzzles, leaderboard, challenges, logout, sendChallenge, exportDossier, importDossier } = useGameState();
+  const { user, puzzles, leaderboard, challenges, logout, sendChallenge, exportDossier, importDossier, syncDatabase } = useGameState();
   const [view, setView] = useState<'dashboard' | 'puzzle' | 'leaderboard' | 'challenge' | 'settings'>('dashboard');
   const [activePuzzle, setActivePuzzle] = useState<Puzzle | null>(null);
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
@@ -25,6 +25,11 @@ export default function Home() {
   const filteredPuzzles = selectedTheme === 'ALL' 
     ? puzzles 
     : puzzles.filter(p => (p as any).theme === selectedTheme);
+
+  const getCount = (theme: string) => {
+    if (theme === 'ALL') return puzzles.length;
+    return puzzles.filter(p => (p as any).theme === theme).length;
+  };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,6 +81,13 @@ export default function Home() {
               <p className="text-[10px] text-violet-400 tracking-widest uppercase mt-1">Level {user.level || 1} | Rank: {user.rank} | Score: {user.score}</p>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={syncDatabase}
+                className="p-2.5 rounded-full transition-all border hover:bg-violet-500/10 text-violet-400/70 hover:text-violet-300 border-transparent hover:border-violet-500/30"
+                title="Refresh Intelligence Database"
+              >
+                <RefreshCw className="w-5 h-5" />
+              </button>
               <button
                 onClick={exportDossier}
                 className="p-2.5 rounded-full transition-all border hover:bg-emerald-500/10 text-emerald-400/70 hover:text-emerald-300 border-transparent hover:border-emerald-500/30"
@@ -186,7 +198,7 @@ export default function Home() {
                         onClick={() => setSelectedTheme('ALL')}
                         className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] uppercase transition-all border ${selectedTheme === 'ALL' ? 'bg-violet-500 text-black border-violet-400' : 'bg-black/20 text-violet-400 border-white/5 hover:border-white/20'}`}
                       >
-                        [ ALL_FILES ]
+                        [ ALL_FILES ({getCount('ALL')}) ]
                       </button>
                       {Object.entries(PUZZLE_THEMES).map(([key, label]) => (
                         <button
@@ -194,7 +206,7 @@ export default function Home() {
                           onClick={() => setSelectedTheme(label)}
                           className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] uppercase transition-all border ${selectedTheme === label ? 'bg-violet-500 text-black border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-black/20 text-violet-400 border-white/5 hover:border-white/20'}`}
                         >
-                          [ {key} ]
+                          [ {key} ({getCount(label)}) ]
                         </button>
                       ))}
                     </div>

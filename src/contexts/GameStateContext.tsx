@@ -71,6 +71,7 @@ type GameStateContextType = {
   solveChallenge: (challengeId: string, answer: string) => Promise<{ correct: boolean; scoreEarned: number }>;
   exportDossier: () => void;
   importDossier: (jsonString: string) => void;
+  syncDatabase: () => void;
 };
 
 const GameStateContext = createContext<GameStateContextType | null>(null);
@@ -98,7 +99,15 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
 
     const storedPuzzles = localStorage.getItem('mi5_puzzles');
     if (storedPuzzles) {
-      setPuzzles(JSON.parse(storedPuzzles));
+      const parsedPuzzles: Puzzle[] = JSON.parse(storedPuzzles);
+      // Migration: Sync with new master list (INITIAL_PUZZLES)
+      // Keep solved status for existing IDs, add new puzzles from master list
+      const syncedPuzzles = INITIAL_PUZZLES.map(masterPuzzle => {
+        const existing = parsedPuzzles.find(p => p.id === masterPuzzle.id);
+        return existing ? { ...masterPuzzle, solved: existing.solved } : masterPuzzle;
+      });
+      setPuzzles(syncedPuzzles);
+      localStorage.setItem('mi5_puzzles', JSON.stringify(syncedPuzzles));
     } else {
       setPuzzles(INITIAL_PUZZLES);
       localStorage.setItem('mi5_puzzles', JSON.stringify(INITIAL_PUZZLES));
@@ -297,8 +306,19 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const syncDatabase = () => {
+    // Force a full rebuild of the puzzle list while maintaining solved status
+    const currentPuzzles = puzzles.length > 0 ? puzzles : JSON.parse(localStorage.getItem('mi5_puzzles') || '[]');
+    const syncedPuzzles = INITIAL_PUZZLES.map(masterPuzzle => {
+      const existing = currentPuzzles.find((p: any) => p.id === masterPuzzle.id);
+      return existing ? { ...masterPuzzle, solved: existing.solved } : masterPuzzle;
+    });
+    saveState({ puzzles: syncedPuzzles });
+    alert(`DATABASE RE-INDEXED: ${syncedPuzzles.length} MISSIONS LOADED.`);
+  };
+
   return (
-    <GameStateContext.Provider value={{ user, puzzles, leaderboard, challenges, login, logout, solvePuzzle, sendChallenge, solveChallenge, exportDossier, importDossier }}>
+    <GameStateContext.Provider value={{ user, puzzles, leaderboard, challenges, login, logout, solvePuzzle, sendChallenge, solveChallenge, exportDossier, importDossier, syncDatabase }}>
       {children}
     </GameStateContext.Provider>
   );
