@@ -236,7 +236,7 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     if (!challenged) return;
 
     // Pick a random puzzle
-    const puzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
+    const puzzle = puzzles[getSecureRandomInt(puzzles.length)];
 
     const newChallenge: Challenge = {
       id: uuidv4(),
