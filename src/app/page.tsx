@@ -139,155 +139,102 @@ export default function Home() {
                   className="space-y-8"
                 >
                   {/* Agent Dossier Card */}
-                  <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-blue-500/10 rounded-3xl blur-xl transition-all duration-500 group-hover:opacity-100 opacity-50"></div>
-                    <div className="border border-white/20 bg-white/5 backdrop-blur-2xl p-8 rounded-3xl relative overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-
-                      {/* Decorative Tech Elements */}
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')] opacity-5 pointer-events-none"></div>
-                      <div className="absolute top-4 right-4 flex gap-1">
-                        <div className="w-1 h-1 bg-violet-500/50 rounded-full"></div>
-                        <div className="w-1 h-1 bg-violet-500/50 rounded-full"></div>
-                        <div className="w-1 h-1 bg-violet-500/50 rounded-full"></div>
-                      </div>
-                      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-violet-500/20 to-transparent"></div>
-
-                      <div className="flex flex-col md:flex-row gap-8 items-start md:items-center relative z-10">
-                        <div className="flex-shrink-0 relative">
-                          <div className="w-24 h-24 rounded-2xl border-2 border-white/30 bg-black/20 flex items-center justify-center overflow-hidden relative">
-                            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                            <User className="w-10 h-10 text-violet-400/50" />
-                            <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-violet-900/50 to-transparent"></div>
-                          </div>
-                          <div className="absolute -bottom-2 -right-2 bg-violet-500 text-[#050b14] text-[10px] font-black px-2 py-1 rounded-md tracking-widest shadow-lg shadow-violet-500/20 uppercase">
-                            00 Status
-                          </div>
+                  <div className="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-40 transition-opacity">
+                      <Terminal className="w-24 h-24 rotate-12" />
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row gap-6 items-center relative z-10">
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-lg border border-white/20 bg-black/40 flex items-center justify-center overflow-hidden">
+                          <User className="w-10 h-10 text-violet-400/50" />
                         </div>
+                        <div className="absolute -bottom-2 -right-2 bg-violet-500 text-black text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">
+                          Verified
+                        </div>
+                      </div>
 
-                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-6 w-full">
-                          <div className="bg-black/20 p-4 rounded-2xl border border-white/10 relative overflow-hidden group-hover:border-white/30 transition-colors">
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-violet-500/20"></div>
-                            <p className="text-violet-500 text-[10px] mb-1 tracking-widest font-bold uppercase">Operative Alias</p>
-                            <p className="text-xl font-bold text-white tracking-wide">{user.username}</p>
-                          </div>
-                          <div className="bg-black/20 p-4 rounded-2xl border border-white/10 relative overflow-hidden group-hover:border-white/30 transition-colors">
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500/20"></div>
-                            <p className="text-violet-500 text-[10px] mb-1 tracking-widest font-bold uppercase">Clearance Rank</p>
-                            <p className="text-xl font-bold text-white tracking-wide">{user.rank}</p>
-                          </div>
-                          <div className="bg-black/20 p-4 rounded-2xl border border-white/10 relative overflow-hidden group-hover:border-white/30 transition-colors">
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-pink-500/20"></div>
-                            <p className="text-violet-500 text-[10px] mb-1 tracking-widest font-bold uppercase">Operative Level</p>
-                            <p className="text-xl font-bold text-white tracking-wide">{user.level || 1}</p>
-                          </div>
-                          <div className="bg-black/20 p-4 rounded-2xl border border-white/10 relative overflow-hidden group-hover:border-white/30 transition-colors">
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/20"></div>
-                            <p className="text-violet-500 text-[10px] mb-1 tracking-widest font-bold uppercase">Intelligence Rating</p>
-                            <p className="text-2xl font-black text-violet-300 drop-shadow-[0_0_8px_rgba(139,92,246,0.5)]">{user.score}</p>
-                          </div>
+                      <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+                        <div>
+                          <p className="text-[10px] text-violet-400 font-bold uppercase tracking-widest mb-1 font-mono-spy">Alias</p>
+                          <p className="text-lg font-bold text-white tracking-tight">{user.username}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-violet-400 font-bold uppercase tracking-widest mb-1 font-mono-spy">Clearance</p>
+                          <p className="text-lg font-bold text-white tracking-tight">{user.rank}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-violet-400 font-bold uppercase tracking-widest mb-1 font-mono-spy">Level</p>
+                          <p className="text-lg font-bold text-white tracking-tight">{user.level || 1}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-violet-400 font-bold uppercase tracking-widest mb-1 font-mono-spy">Intel Rating</p>
+                          <p className="text-xl font-black text-emerald-400 glow-text-emerald tracking-tighter">{user.score}</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Theme Selector */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <button
-                      onClick={() => setSelectedTheme('ALL')}
-                      className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all border ${selectedTheme === 'ALL' ? 'bg-violet-500 text-black border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-white/5 text-violet-500 border-white/10 hover:border-white/30'}`}
-                    >
-                      All Intelligence
-                    </button>
-                    {Object.entries(PUZZLE_THEMES).map(([key, label]) => (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-violet-400/60 font-mono-spy text-[10px] uppercase tracking-[0.3em]">
+                      <div className="w-1 h-1 rounded-full bg-violet-500 animate-ping"></div>
+                      Select Operational Theatre
+                    </div>
+                    <div className="flex flex-wrap gap-2">
                       <button
-                        key={key}
-                        onClick={() => setSelectedTheme(label)}
-                        className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all border ${selectedTheme === label ? 'bg-violet-500 text-black border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-white/5 text-violet-500 border-white/10 hover:border-white/30'}`}
+                        onClick={() => setSelectedTheme('ALL')}
+                        className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] uppercase transition-all border ${selectedTheme === 'ALL' ? 'bg-violet-500 text-black border-violet-400' : 'bg-black/20 text-violet-400 border-white/5 hover:border-white/20'}`}
                       >
-                        {label}
+                        [ ALL_FILES ]
                       </button>
-                    ))}
+                      {Object.entries(PUZZLE_THEMES).map(([key, label]) => (
+                        <button
+                          key={key}
+                          onClick={() => setSelectedTheme(label)}
+                          className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] uppercase transition-all border ${selectedTheme === label ? 'bg-violet-500 text-black border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-black/20 text-violet-400 border-white/5 hover:border-white/20'}`}
+                        >
+                          [ {key} ]
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Missions Grid */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-sm font-bold flex items-center gap-3 text-violet-200 tracking-widest uppercase">
-                        <div className="p-1.5 bg-violet-500/10 rounded border border-white/20">
-                          <Crosshair className="w-4 h-4 text-violet-300" />
-                        </div>
-                        Active Field Assignments
-                      </h2>
-                      <div className="h-[1px] flex-1 bg-gradient-to-r from-violet-500/20 to-transparent ml-4"></div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {filteredPuzzles.map((puzzle) => (
-                        <div
-                          key={puzzle.id}
-                          className={`relative group cursor-pointer`}
-                          onClick={() => {
-                            if (!puzzle.solved) {
-                              setActivePuzzle(puzzle);
-                              setView('puzzle');
-                            }
-                          }}
-                        >
-                          {/* Hover Glow */}
-                          {!puzzle.solved && (
-                            <div className="absolute inset-0 bg-violet-500/5 rounded-3xl blur-md transition-opacity opacity-0 group-hover:opacity-100"></div>
-                          )}
-
-                          <div className={`border p-6 rounded-3xl backdrop-blur-xl transition-all duration-300 h-full flex flex-col relative z-10 ${puzzle.solved
-                            ? 'border-emerald-500/20 bg-emerald-900/10 opacity-60'
-                            : 'border-white/20 bg-white/5 hover:bg-white/5 hover:border-white/40 hover:-translate-y-1 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(139,92,246,0.15)]'
-                            }`}>
-
-                            {/* Top Bar */}
-                            <div className="flex justify-between items-start mb-4">
-                              <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-xl border ${puzzle.solved ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-black/20 border-white/30 shadow-inner'
-                                  }`}>
-                                  {puzzle.solved ? <Unlock className="w-5 h-5 text-emerald-400" /> : <Lock className="w-5 h-5 text-violet-300" />}
-                                </div>
-                                <div>
-                                  <h3 className="font-bold text-lg text-white tracking-wide">{puzzle.title}</h3>
-                                  <p className="text-[10px] text-violet-500 font-bold tracking-widest uppercase mt-0.5">File: {puzzle.id.substring(0, 8)}</p>
-                                </div>
-                              </div>
-
-                              <span className={`text-[10px] px-3 py-1.5 rounded-full border font-bold tracking-widest uppercase ${puzzle.difficulty === 'Easy' ? 'border-blue-500/30 bg-blue-500/10 text-blue-400' :
-                                puzzle.difficulty === 'Medium' ? 'border-amber-500/30 bg-amber-500/10 text-amber-400' :
-                                  'border-red-500/30 bg-red-500/10 text-red-400'
-                                }`}>
-                                {puzzle.difficulty} <span className="opacity-50 ml-1 font-black">x{puzzle.multiplier}</span>
-                              </span>
-                            </div>
-
-                            {/* Description */}
-                            <p className="text-sm text-violet-100/60 mb-6 flex-1 leading-relaxed font-light">{puzzle.description}</p>
-
-                            {/* Bottom Bar */}
-                            <div className="flex justify-between items-center pt-4 border-t border-white/10">
-                              <div className="flex items-center gap-2">
-                                <Terminal className="w-3.5 h-3.5 text-violet-500" />
-                                <span className="text-[10px] text-violet-400 font-bold tracking-widest uppercase">{puzzle.type}</span>
-                              </div>
-
-                              {puzzle.solved ? (
-                                <span className="text-[10px] text-emerald-400 font-bold tracking-widest uppercase flex items-center gap-1">
-                                  <CheckCircle2 className="w-3.5 h-3.5" /> Decrypted
-                                </span>
-                              ) : (
-                                <span className="text-xs text-violet-200 font-bold tracking-widest uppercase flex items-center gap-2 group-hover:text-violet-100 transition-colors bg-violet-500/10 px-4 py-2 rounded-full border border-white/20 group-hover:bg-violet-500/20">
-                                  Initiate <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                                </span>
-                              )}
-                            </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filteredPuzzles.map((puzzle) => (
+                      <div
+                        key={puzzle.id}
+                        className={`glass-panel glass-panel-hover rounded-xl p-5 cursor-pointer transition-all relative overflow-hidden group ${puzzle.solved ? 'opacity-50 grayscale' : ''}`}
+                        onClick={() => {
+                          if (!puzzle.solved) {
+                            setActivePuzzle(puzzle);
+                            setView('puzzle');
+                          }
+                        }}
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div className={`p-2 rounded border ${puzzle.solved ? 'border-emerald-500/30 text-emerald-500' : 'border-violet-500/30 text-violet-400'}`}>
+                            {puzzle.solved ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                           </div>
+                          <span className={`text-[8px] px-2 py-0.5 rounded border font-mono-spy tracking-widest uppercase ${puzzle.difficulty === 'Easy' ? 'border-emerald-500/30 text-emerald-400' : puzzle.difficulty === 'Medium' ? 'border-amber-500/30 text-amber-400' : 'border-red-500/30 text-red-400'}`}>
+                            {puzzle.difficulty} x{puzzle.multiplier}
+                          </span>
                         </div>
-                      ))}
-                    </div>
+
+                        <h3 className="font-bold text-white text-sm mb-2 group-hover:text-violet-400 transition-colors uppercase tracking-wider">{puzzle.title}</h3>
+                        <p className="text-[10px] text-slate-400 line-clamp-2 mb-4 font-light leading-relaxed">{puzzle.description}</p>
+
+                        <div className="flex justify-between items-center pt-4 border-t border-white/5">
+                          <span className="text-[8px] text-violet-500/60 font-mono-spy uppercase">TYPE: {puzzle.type}</span>
+                          {!puzzle.solved && (
+                            <span className="text-[8px] text-violet-400 font-bold uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                              Decrypt <ChevronRight className="w-3 h-3" />
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Challenges Inbox */}
