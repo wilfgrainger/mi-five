@@ -129,7 +129,36 @@ export const installMockApi = () => {
       return createResponse(200, { leaderboard: db.users.sort((a, b) => b.score - a.score) });
     }
 
-    // Challenges (Mocked empty for now to prevent errors)
+    // Checkout
+    if (url.includes('/api/checkout') && method === 'POST') {
+      if (!currentUser) return createResponse(401, { error: 'Unauthorized' });
+      return createResponse(200, { url: 'https://example.com/checkout' });
+    }
+
+    // Challenge solving
+    const challengeSolveMatch = url.match(/\/api\/challenges\/([^\/]+)\/solve/);
+    if (challengeSolveMatch && method === 'POST') {
+      if (!currentUser) return createResponse(401, { error: 'Unauthorized' });
+      const challengeId = challengeSolveMatch[1];
+
+      // Since challenges are mocked empty, we simulate a successful/unsuccessful response
+      // based on whether the answer is provided to avoid breaking the frontend.
+      const { answer } = body as any;
+      if (answer) {
+        // Just simulate a correct answer if any non-empty answer is given,
+        // since we don't store actual challenge data in this simple mock.
+        const earned = 50;
+        currentUser.score += earned;
+        currentUser.rank = calcRank(currentUser.score);
+        currentUser.level = calcLevel(currentUser.score);
+        saveDb();
+        return createResponse(200, { correct: true, scoreEarned: earned });
+      } else {
+        return createResponse(200, { correct: false });
+      }
+    }
+
+    // Challenges
     if (url.includes('/api/challenges') && method === 'GET') {
       if (!currentUser) return createResponse(401, { error: 'Unauthorized' });
       return createResponse(200, { incoming: [], outgoing: [] });
