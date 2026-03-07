@@ -4,6 +4,27 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { v4 as uuidv4 } from 'uuid';
 import { calcLevel, calcRank, checkAnswer } from '@/lib/gameLogic';
 
+function getSecureRandomInt(maxExclusive: number): number {
+  if (maxExclusive <= 0) {
+    throw new Error('maxExclusive must be a positive integer');
+  }
+  const cryptoObj = (typeof window !== 'undefined' && window.crypto) || (typeof self !== 'undefined' && (self as any).crypto);
+  if (!cryptoObj || typeof cryptoObj.getRandomValues !== 'function') {
+    // Fallback to Math.random() if crypto is unavailable; this should be rare in modern browsers.
+    return Math.floor(Math.random() * maxExclusive);
+  }
+  const range = maxExclusive;
+  const maxUint32 = 0xffffffff;
+  const limit = maxUint32 - (maxUint32 % range);
+  const uint32 = new Uint32Array(1);
+  let random;
+  do {
+    cryptoObj.getRandomValues(uint32);
+    random = uint32[0];
+  } while (random >= limit);
+  return random % range;
+}
+
 export type User = {
   id: string;
   email: string;
@@ -161,7 +182,9 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   };
 
   const login = (email: string) => {
-    const username = email.split('@')[0].substring(0, 10).replace(/[^a-zA-Z0-9]/g, '') + Math.floor(Math.random() * 100);
+    const username =
+      email.split('@')[0].substring(0, 10).replace(/[^a-zA-Z0-9]/g, '') +
+      getSecureRandomInt(100);
     const newUser: User = {
       id: uuidv4(),
       email,
