@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { calcLevel, calcRank, checkAnswer } from '@/lib/gameLogic';
+import { ALL_PUZZLES } from '@/lib/puzzles';
 
 function getSecureRandomInt(maxExclusive: number): number {
   if (maxExclusive <= 0) {
@@ -68,54 +69,13 @@ type GameStateContextType = {
   solvePuzzle: (puzzleId: string, answer: string) => Promise<{ correct: boolean; scoreEarned: number }>;
   sendChallenge: (challengedId: string) => void;
   solveChallenge: (challengeId: string, answer: string) => Promise<{ correct: boolean; scoreEarned: number }>;
+  exportDossier: () => void;
+  importDossier: (jsonString: string) => void;
 };
 
 const GameStateContext = createContext<GameStateContextType | null>(null);
 
-const INITIAL_PUZZLES: Puzzle[] = [
-  {
-    id: 'puz_1',
-    title: 'Operation Caesar',
-    description: 'Intercepted text from a known syndicate. Decrypt the message using a shift of 3.',
-    difficulty: 'Easy',
-    multiplier: 1,
-    type: 'substitution',
-    puzzle_data: { encryptedText: 'KHOOR ZRUOG' },
-    answer: 'HELLO WORLD',
-    solved: false,
-  },
-  {
-    id: 'puz_2',
-    title: 'The Berlin Drop',
-    description: 'Find the hidden extraction word at the given coordinates [Line, Word]',
-    difficulty: 'Medium',
-    multiplier: 2,
-    type: 'book',
-    puzzle_data: {
-      text: "The quick brown fox\njumps over the lazy dog\nat midnight near the wall",
-      coordinates: [[3, 5]]
-    },
-    answer: 'wall',
-    solved: false,
-  },
-  {
-    id: 'puz_3',
-    title: 'Moscow Protocols',
-    description: 'Assign frequencies to comm nodes so no two connected nodes share the same frequency. Use max 4 frequencies.',
-    difficulty: 'Hard',
-    multiplier: 3,
-    type: 'map_coloring',
-    puzzle_data: {
-      nodes: [
-        { id: 'Alpha', x: 20, y: 20 },
-        { id: 'Beta', x: 80, y: 20 },
-        { id: 'Gamma', x: 50, y: 80 }
-      ],
-      edges: [['Alpha', 'Beta'], ['Beta', 'Gamma'], ['Alpha', 'Gamma']]
-    },
-    solved: false,
-  }
-];
+const INITIAL_PUZZLES: Puzzle[] = ALL_PUZZLES.map(p => ({ ...p, solved: false }));
 
 const INITIAL_LEADERBOARD: User[] = [
   { id: 'u_1', email: 'james@mi6.gov.uk', username: 'Agent007', score: 1500, rank: 'Director', level: 4, is_pro: 1 },
@@ -300,8 +260,45 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     return { correct: false, scoreEarned: 0 };
   };
 
+  const exportDossier = () => {
+    const data = {
+      user,
+      puzzles,
+      leaderboard,
+      challenges,
+      version: '1.0.0',
+      timestamp: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mi5_dossier_${user?.username || 'agent'}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const importDossier = (jsonString: string) => {
+    try {
+      const data = JSON.parse(jsonString);
+      if (data.user && data.puzzles) {
+        saveState({
+          user: data.user,
+          puzzles: data.puzzles,
+          leaderboard: data.leaderboard || INITIAL_LEADERBOARD,
+          challenges: data.challenges || { incoming: [], outgoing: [] }
+        });
+        window.location.reload(); // Refresh to ensure all state is clean
+      }
+    } catch (e) {
+      console.error('Failed to import dossier:', e);
+      alert('INVALID DOSSIER FORMAT. CORRUPTION DETECTED.');
+    }
+  };
+
   return (
-    <GameStateContext.Provider value={{ user, puzzles, leaderboard, challenges, login, logout, solvePuzzle, sendChallenge, solveChallenge }}>
+    <GameStateContext.Provider value={{ user, puzzles, leaderboard, challenges, login, logout, solvePuzzle, sendChallenge, solveChallenge, exportDossier, importDossier }}>
       {children}
     </GameStateContext.Provider>
   );

@@ -5,20 +5,37 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Shield, Lock, Unlock, User, LogOut, Crosshair, 
   Terminal, ChevronRight, Globe, Database, ArrowLeft, 
-  CheckCircle2, Swords, Radio, X, Star
+  CheckCircle2, Swords, Radio, X, Star, Download, Upload
 } from 'lucide-react';
 import { useGameState, Puzzle, Challenge } from '@/contexts/GameStateContext';
+import { PUZZLE_THEMES } from '@/lib/puzzles';
 import Login from '@/components/Login';
 import PuzzleSolver from '@/components/PuzzleSolver';
 import ChallengeSolver from '@/components/ChallengeSolver';
 
 export default function Home() {
-  const { user, puzzles, leaderboard, challenges, logout, sendChallenge } = useGameState();
-  const [view, setView] = useState<'dashboard' | 'puzzle' | 'leaderboard' | 'challenge'>('dashboard');
+  const { user, puzzles, leaderboard, challenges, logout, sendChallenge, exportDossier, importDossier } = useGameState();
+  const [view, setView] = useState<'dashboard' | 'puzzle' | 'leaderboard' | 'challenge' | 'settings'>('dashboard');
   const [activePuzzle, setActivePuzzle] = useState<Puzzle | null>(null);
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
   const [challengeSending, setChallengeSending] = useState<string | null>(null);
   const [upgradeModal, setUpgradeModal] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState<string>('ALL');
+
+  const filteredPuzzles = selectedTheme === 'ALL' 
+    ? puzzles 
+    : puzzles.filter(p => (p as any).theme === selectedTheme);
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        importDossier(event.target?.result as string);
+      };
+      reader.readAsText(file);
+    }
+  };
 
   if (!user) {
     return <Login />;
@@ -60,6 +77,19 @@ export default function Home() {
             <div className="text-right hidden sm:block bg-black/20 px-4 py-2 rounded-xl border border-white/20 shadow-inner">
               <p className="text-sm font-bold text-white tracking-wide">{user.username}</p>
               <p className="text-[10px] text-violet-400 tracking-widest uppercase mt-1">Level {user.level || 1} | Rank: {user.rank} | Score: {user.score}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={exportDossier}
+                className="p-2.5 rounded-full transition-all border hover:bg-emerald-500/10 text-emerald-400/70 hover:text-emerald-300 border-transparent hover:border-emerald-500/30"
+                title="Export Dossier"
+              >
+                <Download className="w-5 h-5" />
+              </button>
+              <label className="p-2.5 rounded-full transition-all border hover:bg-blue-500/10 text-blue-400/70 hover:text-blue-300 border-transparent hover:border-blue-500/30 cursor-pointer" title="Import Dossier">
+                <Upload className="w-5 h-5" />
+                <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+              </label>
             </div>
             <button
               onClick={() => setUpgradeModal(true)}
@@ -163,6 +193,25 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* Theme Selector */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <button
+                      onClick={() => setSelectedTheme('ALL')}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all border ${selectedTheme === 'ALL' ? 'bg-violet-500 text-black border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-white/5 text-violet-500 border-white/10 hover:border-white/30'}`}
+                    >
+                      All Intelligence
+                    </button>
+                    {Object.entries(PUZZLE_THEMES).map(([key, label]) => (
+                      <button
+                        key={key}
+                        onClick={() => setSelectedTheme(label)}
+                        className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all border ${selectedTheme === label ? 'bg-violet-500 text-black border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-white/5 text-violet-500 border-white/10 hover:border-white/30'}`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
                   {/* Missions Grid */}
                   <div>
                     <div className="flex items-center justify-between mb-6">
@@ -176,7 +225,7 @@ export default function Home() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {puzzles.map((puzzle) => (
+                      {filteredPuzzles.map((puzzle) => (
                         <div
                           key={puzzle.id}
                           className={`relative group cursor-pointer`}
