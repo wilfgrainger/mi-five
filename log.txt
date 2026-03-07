@@ -1,0 +1,10 @@
+2452894 Merge pull request #16 from wilfgrainger/migrate-to-nextjs-static-app-17816517422492678939
+676f5e0 Potential fix for code scanning alert no. 22: Insecure randomness
+6818185 Refactor application from Vite to Next.js Static Export
+4336d51 Merge pull request #15 from wilfgrainger/fix-github-pages-deployment-vite-base-11520993364238470714
+9d7de6d fix: resolve GitHub Pages deployment and implement frontend-only mock API
+cbcaa8e fix: correct GitHub Pages blank screen by serving compiled code from dist/
+dddf4cf Merge pull request #11 from wilfgrainger/perf-opt-puzzle-gen-11520930478206630915
+5c43ddf Merge pull request #14 from wilfgrainger/mock-api-updates-1021370213183289951
+aa83494 Update frontend to fully work independently of worker node.
+3eddac2 Merge pull request #13 from wilfgrainger/fix-github-pages-deployment-vite-base-11520993364238470714
