@@ -46,6 +46,8 @@ export type Puzzle = {
   puzzle_data: any;
   answer?: string;
   solved: boolean;
+  hint?: string;
+  hint_used?: boolean;
 };
 
 export type Challenge = {
@@ -67,6 +69,7 @@ type GameStateContextType = {
   login: (email: string) => void;
   logout: () => void;
   solvePuzzle: (puzzleId: string, answer: string) => Promise<{ correct: boolean; scoreEarned: number }>;
+  requestHint: (puzzleId: string) => void;
   sendChallenge: (challengedId: string) => void;
   solveChallenge: (challengeId: string, answer: string) => Promise<{ correct: boolean; scoreEarned: number }>;
   exportDossier: () => void;
@@ -175,7 +178,10 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
 
     const correct = checkAnswer(puzzle, answer);
     if (correct) {
-      const scoreEarned = 100 * puzzle.multiplier;
+      let scoreEarned = 100 * puzzle.multiplier;
+      if (puzzle.hint_used) {
+        scoreEarned = Math.floor(scoreEarned * 0.5); // 50% penalty for using a hint
+      }
       const newScore = user.score + scoreEarned;
 
       const updatedUser = {
@@ -197,6 +203,13 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
       return { correct: true, scoreEarned };
     }
     return { correct: false, scoreEarned: 0 };
+  };
+
+  const requestHint = (puzzleId: string) => {
+    const updatedPuzzles = puzzles.map(p => 
+      p.id === puzzleId ? { ...p, hint_used: true } : p
+    );
+    saveState({ puzzles: updatedPuzzles });
   };
 
   const sendChallenge = (challengedId: string) => {
@@ -318,11 +331,11 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <GameStateContext.Provider value={{ user, puzzles, leaderboard, challenges, login, logout, solvePuzzle, sendChallenge, solveChallenge, exportDossier, importDossier, syncDatabase }}>
+    <GameStateContext.Provider value={{ user, puzzles, leaderboard, challenges, login, logout, solvePuzzle, requestHint, sendChallenge, solveChallenge, exportDossier, importDossier, syncDatabase }}>
       {children}
     </GameStateContext.Provider>
   );
-}
+  }
 
 export function useGameState() {
   const context = useContext(GameStateContext);

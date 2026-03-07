@@ -6,7 +6,7 @@ import { Terminal, Shield, CheckCircle2, AlertTriangle, Crosshair, Cpu } from 'l
 import { useGameState, Puzzle } from '@/contexts/GameStateContext';
 
 export default function PuzzleSolver({ puzzle, onSolved }: { puzzle: Puzzle; onSolved: () => void }) {
-  const { solvePuzzle } = useGameState();
+  const { solvePuzzle, requestHint } = useGameState();
   const [answer, setAnswer] = useState('');
   const [status, setStatus] = useState<'idle' | 'checking' | 'correct' | 'incorrect'>('idle');
   const [resultData, setResultData] = useState<any>(null);
@@ -53,6 +53,11 @@ export default function PuzzleSolver({ puzzle, onSolved }: { puzzle: Puzzle; onS
           </h2>
         </div>
         <div className="flex items-center gap-2">
+          {puzzle.hint_used && (
+            <span className="text-[8px] font-mono-spy text-amber-500 uppercase tracking-widest border border-amber-500/30 px-2 py-0.5 rounded">
+              INTEL_PENALTY_ACTIVE
+            </span>
+          )}
           <span className="w-2 h-2 rounded-full bg-violet-500 animate-ping"></span>
           <span className="text-[8px] font-mono-spy text-violet-500 uppercase tracking-widest">
             {puzzle.difficulty} PRIORITY
@@ -62,11 +67,40 @@ export default function PuzzleSolver({ puzzle, onSolved }: { puzzle: Puzzle; onS
 
       <div className="p-6 md:p-10">
         <div className="mb-10">
-          <h1 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight">{puzzle.title}</h1>
+          <div className="flex justify-between items-start mb-4">
+            <h1 className="text-2xl font-bold text-white uppercase tracking-tight">{puzzle.title}</h1>
+            {puzzle.hint && !puzzle.hint_used && (
+              <button 
+                onClick={() => requestHint(puzzle.id)}
+                className="text-[8px] font-mono-spy text-violet-400 hover:text-violet-300 border border-violet-500/20 px-3 py-1 rounded transition-colors uppercase tracking-widest"
+              >
+                [ Request Intel Hint ]
+              </button>
+            )}
+          </div>
           <div className="p-6 bg-black/40 border-l-2 border-violet-500 rounded-r-xl font-mono-spy text-sm leading-relaxed text-slate-300">
             <span className="text-violet-500 mr-2 opacity-50">&gt;</span>
             {puzzle.description}
           </div>
+          
+          <AnimatePresence>
+            {puzzle.hint_used && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                className="mt-4 p-4 bg-amber-500/5 border-l-2 border-amber-500 rounded-r-xl font-mono-spy text-xs text-amber-200/80 italic overflow-hidden"
+              >
+                <div className="flex items-center gap-2 mb-2 text-amber-500 non-italic">
+                  <AlertTriangle className="w-3 h-3" />
+                  <span className="font-bold uppercase tracking-widest">Decrypted Intelligence Hint</span>
+                </div>
+                {puzzle.hint}
+                <div className="mt-2 text-[10px] text-amber-500/50 non-italic uppercase tracking-tighter">
+                  Warning: Using intelligence assets has reduced the mission score potential by 50%.
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {puzzle.type === 'substitution' && puzzle.puzzle_data?.encryptedText && (
